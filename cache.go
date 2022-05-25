@@ -22,7 +22,7 @@ func (c Cache) Get(key string) (string, bool) {
 }
 
 func (c Cache) Put(key, value string) {
-	d := Data{Value: value, Deadline: time.Now()}
+	d := Data{Value: value, Deadline: time.Now().Add(10 * time.Minute)}
 	c.Data[key] = d
 }
 
