@@ -2,6 +2,15 @@ package cache
 
 import "time"
 
+func (c Cache) clear() Cache {
+	for key, value := range c.Data {
+		if time.Now().After(value.Deadline) {
+			delete(c.Data, key)
+		}
+	}
+	return c
+}
+
 type Cache struct {
 	Data map[string]Data
 }
@@ -17,16 +26,19 @@ func NewCache() Cache {
 }
 
 func (c Cache) Get(key string) (string, bool) {
+	c = c.clear()
 	value, ok := c.Data[key]
 	return value.Value, ok
 }
 
 func (c Cache) Put(key, value string) {
+	c = c.clear()
 	d := Data{Value: value, Deadline: time.Now().Add(10 * time.Minute)}
 	c.Data[key] = d
 }
 
 func (c Cache) Keys() []string {
+	c = c.clear()
 	keys := []string{}
 	now := time.Now()
 	for key, data := range c.Data {
@@ -38,6 +50,7 @@ func (c Cache) Keys() []string {
 }
 
 func (c Cache) PutTill(key, value string, deadline time.Time) {
+	c = c.clear()
 	d := Data{Value: value, Deadline: deadline}
 	c.Data[key] = d
 }
